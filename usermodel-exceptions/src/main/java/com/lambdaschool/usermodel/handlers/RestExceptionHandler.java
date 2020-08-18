@@ -33,13 +33,20 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Arrays;
 import java.util.Date;
 
+//22 extend an abstract class from Spring called Response EntityExceptionHandler
+
 /**
  * This is the driving class when an exception occurs. All exceptions are handled here.
  * This class is shared across all controllers due to the annotation RestControllerAdvice;
  * this class gives advice to all controllers on how to handle exceptions.
  * Due to the annotation Order(Ordered.HIGHEST_PRECEDENCE), this class takes precedence over all other controller advisors.
  */
+//24. If we get an exception, everything needs to stop because the flow of the app is interrupted
+// . so no matter what controllers there are make sure this one has the highest Precedence so it
+// runs first and if something is wronng it triggers and stops everything.
 @Order(Ordered.HIGHEST_PRECEDENCE)
+//23 RestControllerAdvice- when an exception happens spring is going to see if there is any
+// advice in our rest controllers how to handle said exceptions.
 @RestControllerAdvice
 public class RestExceptionHandler
         extends ResponseEntityExceptionHandler
@@ -47,12 +54,15 @@ public class RestExceptionHandler
     /**
      * Connects this class with the Helper Functions
      */
+//    *********** Part of 34 **************
+//            go back to 34 when autowire is done
     @Autowired
     private HelperFunctions helperFunctions;
 
     /**
      * The constructor for the RestExceptionHandler. Currently we do not do anything special. We just call the parent constructor.
      */
+//   25. Generate a Constructor and call super within it.
     public RestExceptionHandler()
     {
         super();
@@ -64,18 +74,38 @@ public class RestExceptionHandler
      * @param rnfe All the information about the exception that is thrown.
      * @return The error details for displaying to the client plus the status Not Found.
      */
+//    41. we want to handle our exception ResourceNotFoundException differently with annotation
+//    ExceptionHandler, then put any valid Exception, this is how you pin point which exception
+//    you want to handle.  this ExceptionHandler starts out right above step 26. but we add the
+//    following things to make it so far above.
     @ExceptionHandler(ResourceNotFoundException.class)
+    //    42. like we said earlier its a response so its a response entity, everything that handles
+//    an exception starts with handle and then the name of the exception. because spring is doing
+//    things for me we get to pick the parameter of ResourseNotFounexception(rnfe) and call it rnfe,
+//    so the exception that gets thrown by jave we capture it here and doe something with it.
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException rnfe)
     {
-        ErrorDetail errorDetail = new ErrorDetail();
+//        44. we use what is about to build error detail. just like we did before. they can be
+//        so similar  java will say you have duplicate code, but you dont.
+            ErrorDetail errorDetail = new ErrorDetail();
+//      45.     Set the Time
         errorDetail.setTimestamp(new Date());
+//      46.  Set the status and our case we are using the Status of Not_Found, and the value of it.
         errorDetail.setStatus(HttpStatus.NOT_FOUND.value());
+//      47. Error message Title
         errorDetail.setTitle("Resource Not Found");
+//      48.  Error Message
         errorDetail.setDetail(rnfe.getMessage());
+//      49. add developer Message.
         errorDetail.setDeveloperMessage(rnfe.getClass()
                                                 .getName());
+//      50. fill in validation errors just in case we need them. and now we created our custome
+//      method to handle or custom exception.
         errorDetail.setErrors(helperFunctions.getConstraintViolation(rnfe));
-
+//      51. Run the app and test it out by trigggering a message.
+//      52. go to applicatin properties
+//      43. Create your Return as below we want the error detail, no headers, and HttStatus Not
+//      Found(404)
         return new ResponseEntity<>(errorDetail,
                                     null,
                                     HttpStatus.NOT_FOUND);
@@ -87,6 +117,7 @@ public class RestExceptionHandler
      * @param rfe All the information about the exception that is thrown.
      * @return The error details for displaying to the client plus the status Bad Request.
      */
+
     @ExceptionHandler(ResourceFoundException.class)
     public ResponseEntity<?> handleResourceFoundException(ResourceFoundException rfe)
     {
@@ -114,7 +145,11 @@ public class RestExceptionHandler
      * @param request The request that was made by the client. Not used in this method.
      * @return The error details to display to the client plus the status that from the exception.
      */
+
+//    26. next we need to make an override. click generate override methods, a bunch of options
+//    show up.  first pick handleExceptionInternal, get rid of return because we will write our own.
     @Override
+//    object and question mark within<> are the same thing. Object is more backwards compatible
     protected ResponseEntity<Object> handleExceptionInternal(
             Exception ex,
             Object body,
@@ -122,20 +157,46 @@ public class RestExceptionHandler
             HttpStatus status,
             WebRequest request)
     {
+//  27. we want to send back the results once the exception happens so we send out an error detail
         ErrorDetail errorDetail = new ErrorDetail();
+//        29. first set timestamp
         errorDetail.setTimestamp(new Date());
+//        30. next setStatus, which is given to us but we need it in its int form so we need its
+//        value.
         errorDetail.setStatus(status.value());
+//        31. Set Generic Title, there are also.gets that you can add to this that gives you
+//        different info
         errorDetail.setTitle("Rest Internal Exception");
+//        32. Set Message, which is the details of the errors.
         errorDetail.setDetail(ex.getMessage());
+//        33. what type of message do we want to send back, which is the class that is causing
+//        the problem, this might help or not, the crucial info we give back is the value and
+//        message. and a list of errors.
+
         errorDetail.setDeveloperMessage(ex.getClass()
                                                 .getName());
-        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
+//        34. set the list of errors, and we already have a method helping us with this that we
+//        made at the beinning, inside of helperFunctions called getConstraintViolation. First we
+//        wire that in at the top then come back and finish this call. ex is the exception. we
+//        could of done this.getError(WebRequest) if we wanted to but since Spring has already
+//        done it for us we just use ex. we can check now to see if our exceptions work, run the
+//        app and in postman do an invalid request to see the new error lay out.
 
+//        35. Next we want to fancy up the user id not found error message so its more specific,
+//        in order to find this we have to figure it where its coming from and what method its
+//        using, in our case we go to our controllers, User Controller, one of the endpoints in
+//        controller is to look for a user base off of id that endpoint ultimately calls find
+//        user by id from user service so go to user service impl.
+
+        errorDetail.setErrors(helperFunctions.getConstraintViolation(ex));
+//28. we want to return errorDetail, we want it to return a status as well. next fill in error
+// detail.
         return new ResponseEntity<>(errorDetail,
                                     null,
                                     status);
     }
 
+//    ********************************Extra Notes/Code*********************************************
     /*********************
      * The rest of the methods are not required and so are provided for reference only.
      * They allow you to better customized exception messages

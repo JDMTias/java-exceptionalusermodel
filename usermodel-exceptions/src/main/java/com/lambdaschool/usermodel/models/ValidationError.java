@@ -1,4 +1,8 @@
 package com.lambdaschool.usermodel.models;
+//this is a list of errors that joins with Validatin error in error detail.
+//
+
+//notice there is no constructor, we will let the JDK handle that for us
 
 /**
  * A model to report a validation error
@@ -11,7 +15,7 @@ public class ValidationError
     private String Code;
 
     /**
-     * The message (String) fro the validation error
+     * The message (String) from the validation error
      */
     private String message;
 
@@ -60,6 +64,8 @@ public class ValidationError
      *
      * @return The current validation error as a String
      */
+
+//    stop here go to error detail
     @Override
     public String toString()
     {

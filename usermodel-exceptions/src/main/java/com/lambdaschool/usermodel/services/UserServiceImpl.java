@@ -32,7 +32,11 @@ public class UserServiceImpl
      */
     @Autowired
     private RoleService roleService;
-
+//  35. find userbyId, notice that in that code we said if you can't find an id send out an
+//      exception, instead of throwing that exception we want to customize it, so we change
+//      it from entitynotfoundexception to ResourceNotFoundException, lets go create that exception
+//    36. create a new java class in exceptions with the name of the new exception which is
+//    ResourceNotFoundException
     public User findUserById(long id) throws
             ResourceNotFoundException
     {
