@@ -1,3 +1,11 @@
+# What is an exception in java
+    when the normal flow of the app is interrupted something happens that interrupts the flow, like
+ looking for a file or varialb ethat was missin, incorrect math expression, lost acces to the
+  server or data base.  The user could go to an endpoint that doesn't exist. sending wrong data
+   type.
+   weird one off things that can cause problems.
+   
+
 # Java User Model Final Version / Exceptions Final Application
 
 ## Introduction
